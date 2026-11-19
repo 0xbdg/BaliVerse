@@ -7,6 +7,68 @@ export interface PreparedIsland {
   /** minX, minZ, 1 / width, 1 / depth */
   shoreBounds: THREE.Vector4
   maxHeight: number
+  /** Sampel ketinggian untuk menempatkan vegetasi & landmark. */
+  heightField: HeightField
+}
+
+/**
+ * Heightfield kasar (grid) hasil sampling mesh terrain.
+ * Dipakai untuk menempelkan objek ke permukaan tanpa raycast 322k triangle.
+ */
+export class HeightField {
+  readonly minX: number
+  readonly maxX: number
+  readonly minZ: number
+  readonly maxZ: number
+  readonly resolution: number
+  private readonly data: Float32Array
+
+  constructor(
+    minX: number,
+    maxX: number,
+    minZ: number,
+    maxZ: number,
+    resolution: number,
+    data: Float32Array,
+  ) {
+    this.minX = minX
+    this.maxX = maxX
+    this.minZ = minZ
+    this.maxZ = maxZ
+    this.resolution = resolution
+    this.data = data
+  }
+
+  heightAt(x: number, z: number): number {
+    const u = (x - this.minX) / (this.maxX - this.minX)
+    const v = (z - this.minZ) / (this.maxZ - this.minZ)
+    if (u < 0 || u > 1 || v < 0 || v > 1) return 0
+
+    const size = this.resolution - 1
+    const fx = u * size
+    const fz = v * size
+    const x0 = Math.min(size - 1, Math.floor(fx))
+    const z0 = Math.min(size - 1, Math.floor(fz))
+    const tx = fx - x0
+    const tz = fz - z0
+
+    const row = z0 * this.resolution
+    const v00 = this.data[row + x0]
+    const v10 = this.data[row + x0 + 1]
+    const v01 = this.data[row + this.resolution + x0]
+    const v11 = this.data[row + this.resolution + x0 + 1]
+
+    const a = v00 + (v10 - v00) * tx
+    const b = v01 + (v11 - v01) * tx
+    return a + (b - a) * tz
+  }
+
+  /** Kemiringan lokal (rise / run) untuk menolak tebing terjal. */
+  slopeAt(x: number, z: number, delta = 0.06): number {
+    const dx = this.heightAt(x + delta, z) - this.heightAt(x - delta, z)
+    const dz = this.heightAt(x, z + delta) - this.heightAt(x, z - delta)
+    return Math.hypot(dx, dz) / (delta * 2)
+  }
 }
 
 const preparedCache = new WeakMap<THREE.BufferGeometry, PreparedIsland>()
@@ -53,6 +115,7 @@ export function prepareIsland(scene: THREE.Object3D): PreparedIsland {
 
   const bounds = geometry.boundingBox!
   const maxHeight = Math.max(bounds.max.y, 0.001)
+  const heightField = buildHeightField(geometry, bounds)
 
   colorizeTerrain(geometry, maxHeight)
 
@@ -63,6 +126,7 @@ export function prepareIsland(scene: THREE.Object3D): PreparedIsland {
     shoreMask: texture,
     shoreBounds,
     maxHeight,
+    heightField,
   }
   preparedCache.set(geometry, prepared)
   writePreparedCache(geometry, prepared)
@@ -75,6 +139,40 @@ function readPreparedCache(geometry: THREE.BufferGeometry): PreparedIsland | und
 
 function writePreparedCache(geometry: THREE.BufferGeometry, prepared: PreparedIsland) {
   ;(geometry.userData as { baliPrepared?: PreparedIsland }).baliPrepared = prepared
+}
+
+const HEIGHTFIELD_RESOLUTION = 384
+
+function buildHeightField(
+  geometry: THREE.BufferGeometry,
+  bounds: THREE.Box3,
+): HeightField {
+  const { min, max } = bounds
+  const width = max.x - min.x
+  const depth = max.z - min.z
+  const data = new Float32Array(HEIGHTFIELD_RESOLUTION * HEIGHTFIELD_RESOLUTION)
+  const position = geometry.getAttribute('position')
+
+  for (let i = 0; i < position.count; i += 1) {
+    const u = (position.getX(i) - min.x) / width
+    const v = (position.getZ(i) - min.z) / depth
+    if (u < 0 || u > 1 || v < 0 || v > 1) continue
+
+    const x = Math.min(HEIGHTFIELD_RESOLUTION - 1, Math.floor(u * HEIGHTFIELD_RESOLUTION))
+    const z = Math.min(HEIGHTFIELD_RESOLUTION - 1, Math.floor(v * HEIGHTFIELD_RESOLUTION))
+    const index = z * HEIGHTFIELD_RESOLUTION + x
+    const y = position.getY(i)
+    if (y > data[index]) data[index] = y
+  }
+
+  return new HeightField(
+    min.x,
+    max.x,
+    min.z,
+    max.z,
+    HEIGHTFIELD_RESOLUTION,
+    data,
+  )
 }
 
 type Stop = { at: number; color: THREE.Color }

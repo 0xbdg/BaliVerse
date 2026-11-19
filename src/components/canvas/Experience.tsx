@@ -1,26 +1,37 @@
-import { Suspense } from 'react'
-import { Sky, useGLTF } from '@react-three/drei'
-import { FOG_COLOR, FOG_FAR, FOG_NEAR, ISLAND_ASSET, SUN_POSITION } from '../../data/island'
+import { Suspense, useEffect } from 'react'
+import { useGLTF } from '@react-three/drei'
+import { useThree } from '@react-three/fiber'
+import { DAY_PALETTE } from '../../data/environment'
+import { FOG_FAR, FOG_NEAR, ISLAND_ASSET } from '../../data/island'
+import { Atmosphere } from './Atmosphere'
 import { CameraRig } from './CameraRig'
 import { IslandWorld } from './IslandWorld'
 import { Lighting } from './Lighting'
+import { SkyDome } from './SkyDome'
 
 useGLTF.preload(ISLAND_ASSET)
+
+/** Ekspos scene Three.js saat development untuk inspeksi visual. */
+function DebugBridge() {
+  const scene = useThree((state) => state.scene)
+
+  useEffect(() => {
+    if (import.meta.env.DEV) {
+      ;(window as unknown as { __three?: typeof scene }).__three = scene
+    }
+  }, [scene])
+
+  return null
+}
 
 export function Experience() {
   return (
     <>
-      <color attach="background" args={[FOG_COLOR]} />
-      <fog attach="fog" args={[FOG_COLOR, FOG_NEAR, FOG_FAR]} />
+      <color attach="background" args={[DAY_PALETTE.fog]} />
+      <fog attach="fog" args={[DAY_PALETTE.fog, FOG_NEAR, FOG_FAR]} />
 
-      <Sky
-        sunPosition={SUN_POSITION}
-        turbidity={5}
-        rayleigh={1.4}
-        mieCoefficient={0.004}
-        mieDirectionalG={0.85}
-      />
-
+      <SkyDome />
+      <Atmosphere />
       <Lighting />
 
       <Suspense fallback={null}>
@@ -28,6 +39,7 @@ export function Experience() {
       </Suspense>
 
       <CameraRig />
+      <DebugBridge />
     </>
   )
 }
