@@ -59,7 +59,7 @@ export function Uluwatu({ heightField }: UluwatuProps) {
   return (
     <group position={[landmark.x, base, landmark.z]}>
       <mesh geometry={mainCliff} castShadow receiveShadow>
-        <meshStandardMaterial color="#5b5142" roughness={1} flatShading />
+        <meshStandardMaterial color="#8a7c64" roughness={1} flatShading />
       </mesh>
       <mesh
         geometry={sideCliff}
@@ -68,7 +68,7 @@ export function Uluwatu({ heightField }: UluwatuProps) {
         castShadow
         receiveShadow
       >
-        <meshStandardMaterial color="#514838" roughness={1} flatShading />
+        <meshStandardMaterial color="#7c7059" roughness={1} flatShading />
       </mesh>
       <mesh
         geometry={spurCliff}
@@ -77,7 +77,7 @@ export function Uluwatu({ heightField }: UluwatuProps) {
         castShadow
         receiveShadow
       >
-        <meshStandardMaterial color="#635845" roughness={1} flatShading />
+        <meshStandardMaterial color="#94866c" roughness={1} flatShading />
       </mesh>
 
       <mesh position={[0.04, 0.735, 0.02]} receiveShadow>
@@ -86,12 +86,12 @@ export function Uluwatu({ heightField }: UluwatuProps) {
       </mesh>
 
       <group position={[0.04, 0.765, 0.02]} rotation={[0, -1.15, 0]}>
-        <CandiBentai scale={0.8} />
-        <MeruShrine position={[0.08, 0, -0.16]} scale={0.95} rotation={0.2} />
+        <CandiBentai scale={1.1} />
+        <MeruShrine position={[0.08, 0, -0.16]} scale={1.25} rotation={0.2} />
       </group>
 
-      <HeroPalm position={[0.26, 0.76, 0.16]} scale={0.6} rotation={0.6} />
-      <HeroPalm position={[-0.22, 0.76, -0.06]} scale={0.54} rotation={2.1} />
+      <HeroPalm position={[0.3, 0.76, 0.2]} scale={0.38} rotation={0.6} />
+      <HeroPalm position={[-0.26, 0.76, -0.1]} scale={0.34} rotation={2.1} />
     </group>
   )
 }

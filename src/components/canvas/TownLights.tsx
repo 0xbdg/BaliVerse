@@ -32,10 +32,10 @@ export function TownLights({ heightField }: TownLightsProps) {
     blend.current = THREE.MathUtils.damp(blend.current, target, 1.9, delta)
 
     lights.current.forEach((light) => {
-      if (light) light.intensity = 4.5 * blend.current
+      if (light) light.intensity = 2.2 * blend.current
     })
     materials.current.forEach((material) => {
-      if (material) material.opacity = 0.4 * blend.current
+      if (material) material.opacity = 0.32 * blend.current
     })
   })
 
@@ -50,7 +50,7 @@ export function TownLights({ heightField }: TownLightsProps) {
             position={[spot.x, spot.y, spot.z]}
             color="#ffb45e"
             intensity={0}
-            distance={4.2}
+            distance={3}
             decay={2}
           />
           <sprite position={[spot.x, spot.y, spot.z]} scale={[spot.scale, spot.scale, 1]}>

@@ -3,11 +3,11 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
 const CLOUDS = [
-  { x: -14, y: 8.5, z: -10, scale: 2.4, speed: 0.12 },
-  { x: 7, y: 9.5, z: -14, scale: 2.8, speed: 0.08 },
-  { x: 15, y: 8, z: -2, scale: 2.0, speed: 0.16 },
-  { x: -9, y: 9.2, z: -18, scale: 2.6, speed: 0.1 },
-  { x: 1, y: 8.2, z: -20, scale: 2.2, speed: 0.13 },
+  { x: -22, y: 11.5, z: -14, scale: 2.1, speed: 0.12 },
+  { x: 8, y: 12.8, z: -24, scale: 2.3, speed: 0.08 },
+  { x: 24, y: 10.8, z: -4, scale: 1.9, speed: 0.16 },
+  { x: -16, y: 12.2, z: -26, scale: 2.2, speed: 0.1 },
+  { x: 2, y: 11.8, z: -28, scale: 2.0, speed: 0.13 },
 ]
 
 const BLOBS = [
@@ -25,18 +25,18 @@ const BLOBS = [
 export function Clouds() {
   const groups = useRef<Array<THREE.Group | null>>([])
 
-  const geometry = useMemo(() => new THREE.IcosahedronGeometry(0.5, 0), [])
+  const geometry = useMemo(() => new THREE.IcosahedronGeometry(0.5, 1), [])
   const material = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
         color: '#fbfdff',
         emissive: '#d6e9f5',
-        emissiveIntensity: 0.45,
+        emissiveIntensity: 0.4,
         roughness: 1,
         metalness: 0,
         flatShading: false,
         transparent: true,
-        opacity: 0.68,
+        opacity: 0.62,
         depthWrite: false,
       }),
     [],
@@ -47,8 +47,8 @@ export function Clouds() {
     groups.current.forEach((group, index) => {
       if (!group) return
       const cloud = CLOUDS[index]
-      const travel = (cloud.x + time * cloud.speed + 24) % 48
-      group.position.x = travel - 24
+      const travel = (cloud.x + time * cloud.speed + 30) % 60
+      group.position.x = travel - 30
     })
   })
 

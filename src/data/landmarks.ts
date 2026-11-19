@@ -68,11 +68,11 @@ export const LANDMARKS: LandmarkDefinition[] = [
 
 /** Titik lampu kota/pura yang menyala saat malam. */
 export const NIGHT_LIGHT_SPOTS: Array<{ x: number; z: number; height: number; scale: number }> = [
-  { x: 2.6, z: 3.66, height: 0.28, scale: 0.4 },
-  { x: 4.05, z: 0.55, height: 0.2, scale: 0.32 },
-  { x: 1.5, z: 3.5, height: 0.18, scale: 0.28 },
-  { x: 1.12, z: 6.82, height: 0.88, scale: 0.3 },
-  { x: 0.55, z: 3.25, height: 0.44, scale: 0.28 },
+  { x: 2.6, z: 3.66, height: 0.28, scale: 0.22 },
+  { x: 4.05, z: 0.55, height: 0.2, scale: 0.18 },
+  { x: 1.5, z: 3.5, height: 0.18, scale: 0.16 },
+  { x: 1.12, z: 6.82, height: 0.92, scale: 0.18 },
+  { x: 0.55, z: 3.25, height: 0.48, scale: 0.18 },
 ]
 
 export const LANDMARK_CLEARANCES = LANDMARKS.map((landmark) => ({
